@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>LLaMA3 Full Screen Chat</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<div class="app">
+    <header class="header">
+        🤖 LLaMA3 Chatbot
+    </header>
+
+    <main id="chat-box" class="chat-box"></main>
+
+    <footer class="input-area">
+        <input
+            id="userInput"
+            placeholder="Type your message..."
+            autocomplete="off"
+        />
+        <button onclick="sendMessage()">Send</button>
+    </footer>
+</div>
+
+<script>
+async function sendMessage() {
+    const input = document.getElementById("userInput");
+    const message = input.value.trim();
+    if (!message) return;
+
+    const chatBox = document.getElementById("chat-box");
+
+    chatBox.innerHTML += `<div class="msg user">${message}</div>`;
+    input.value = "";
+
+    chatBox.scrollTop = chatBox.scrollHeight;
+
+    const response = await fetch("/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message })
+    });
+
+    const data = await response.json();
+    chatBox.innerHTML += `<div class="msg bot">${data.reply}</div>`;
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+document.getElementById("userInput").addEventListener("keypress", e => {
+    if (e.key === "Enter") sendMessage();
+});
+</script>
+
+</body>
+</html>
